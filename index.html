@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css"> 
+
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+
+</head>
+<body>
+    <div class="container">
+
+        <h1>Instructeur Coursetro </h1>
+
+        <h2 id="instructor"></h2>
+
+        <label for="name" class="col-lg-2 control-label">Instructor Name</label>
+        <input id="name" type="text">
+
+        <label for="name" class="col-lg-2 control-label">Instructor Age</label>
+        <input id="age" type="text">
+
+        <button id="button">Update Instructor</button>
+
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    <script>
+      
+	   if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            // set the provider you want from Web3.providers
+            web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+        }
+		
+		//définit le compte ethereum a utiliser par défaut 
+             web3.eth.defaultAccount= web3.eth.accounts[0];
+          //l'abi du contrat qui décrit toutes ses fonctions , io , parametres; ...
+           var CoursetroContract= web3.eth.contract([ { "constant": false, "inputs": [ { "name": "_fname", "type": "string" }, { "name": "_age", "type": "uint256" } ], "name": "setInstructor", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "getInstructor", "outputs": [ { "name": "", "type": "string" }, { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" } ]);
+           
+//l'adresse du contrat 
+		   var Coursetro=CoursetroContract.at('0x15e92fccf0ae07c2ad746ce7463b9aa3b8c7b7e2');
+		   // console pour voir les erreurs 
+		   console.log(Coursetro);
+    
+// lors de l'ouverture ou du rafraichissment de la page on extrait les champs nom et age actuels sur le contrat et on les affiche
+  Coursetro.getInstructor(function(error, result){
+            if(!error)
+                {
+                    $("#instructor").html(result[0]+' ('+result[1]+' years old)');
+                    console.log(result);
+                }
+            else
+                console.error(error);
+        });
+//lorsqu'on clique sur le bouton on envoie les champs au contract
+        $("#button").click(function() {
+            Coursetro.setInstructor($("#name").val(), $("#age").val());
+        });
+  
+  
+  
+  
+  
+	
+	</script>
+
+</body>
+</html>
+
+
+
